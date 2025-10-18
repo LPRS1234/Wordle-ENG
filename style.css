@@ -1,19 +1,70 @@
+.title {
+    text-align: center;
+}
+
+.warning {
+    color: red;
+}
+
 .wordle-row {
     display: flex;
     flex-direction: row;
     justify-content: center;
 }
 
-.wordle-box {
-    margin-right: 10px;
-    margin-bottom: 10px;
-    width: 80px;
-    height: 80px;
-    font-size: 40px;
-    text-align: center;
-}
-
 .disabled {
     background-color: white;
     border: 1px solid;
+}
+
+.wordle-box {
+    margin-right: 10px;
+    margin-bottom: 10px;
+    width: 90px;
+    height: 90px;
+    font-size: 50px;
+    text-align: center;
+    font-weight: 700;
+    transition-duration: 0.3s;
+    border: 1px solid #DFE1E9;
+    outline: 1px solid #DFE1E9;
+    background-color: #FBFCFF;
+    caret-color: transparent;
+}
+
+.popup-page {
+    position: fixed;       /* 화면 기준으로 고정 */
+    top: 50%;              /* 세로 중앙 */
+    left: 50%;             /* 가로 중앙 */
+    transform: translate(-50%, -50%); /* 중앙 정렬 보정 */
+    width: 500px;
+    height: 350px;
+    background-color: white;
+    border: 1px solid #000;
+    border-radius: 12px;
+    background-color: rgba(255, 255, 255, 0.5);
+    z-index: 1000;         /* input보다 위에 표시 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3); /* 그림자 */
+    text-align: center;
+}
+
+.popup-page button {
+    width: 120px;
+    height: 50px;
+    border-radius: 10px;
+    border: none;
+    background-color: skyblue;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.popup-page button:hover {
+    cursor: pointer;
+}
+
+.none {
+    display: none;
 }
