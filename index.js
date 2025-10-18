@@ -27,8 +27,32 @@ function StartGame() {
     currentRowInputs[0].focus();
   }
 
-  let isInputed = currentRowInputs.forEach((input) => {
-    
+  const keyboard = [
+    "a","b","c","d","e","f","g","h","i","j",
+    "k","l","m","n","o","p","q","r","s","t",
+    "u","v","w","x","y","z","backspace"
+  ];
+  
+  currentRowInputs.forEach((input, index) => {
+    input.addEventListener("keyup", (e) => {
+        const userKeyEvent = e.key.toLowerCase()
+        console.log(userKeyEvent)
+        if(keyboard.includes(`${userKeyEvent}`)) { //알파벳과 Backspace 선별
+            if(e.key !== "Backspace") {
+                if(index < 3) {
+                    //input에 입력시 다음칸으로 이동
+                    currentRowInputs[index+1].focus()
+                }
+            } else {
+                //백스페이스 눌렀을때 이전 칸 이동
+                if(!currentRowInputs[index].value) {
+                    if(index > 0) {
+                        currentRowInputs[index-1].focus()
+                    }
+                }
+            }
+        }
+    })
   })
 
   //채점 및 다음 줄 이동
