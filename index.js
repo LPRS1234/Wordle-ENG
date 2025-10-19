@@ -16,8 +16,17 @@ function MakeAnswer() {
 
 let answer = MakeAnswer();
 
+// 정답 분리
+let splitedAnswer = answer.split("");
+
 let currentRow = 0;
 let isPlaying = true;
+
+// 색 정의
+const green = "#538D4E";
+const yellow = "#B59F3B";
+const grey = "#3A3A3C";
+const text = "#F8F8F8";
 
 // input 열 nodelist 로 가져오기
 const inputRows = document.querySelectorAll(".wordle-row");
@@ -72,16 +81,20 @@ function ApplyColor(input, text, color) {
   input.setAttribute("disabled", "");
 }
 
+function JudgeAnswer(input, index) {
+  // 색처리, 줄 비활성화
+  const value = input.value;
+  if (value === splitedAnswer[index]) {
+    ApplyColor(input, text, green);
+  } else if (splitedAnswer.includes(value)) {
+    ApplyColor(input, text, yellow);
+  } else {
+    ApplyColor(input, text, grey);
+  }
+}
+
 //채점 및 다음 줄 이동
 document.addEventListener("keydown", (e) => {
-  //색 정의
-  const green = "#538D4E";
-  const yellow = "#B59F3B";
-  const grey = "#3A3A3C";
-  const text = "#F8F8F8";
-
-  // 정답 분리
-  let splitedAnswer = answer.split("");
 
   //Enter키 입력확인
   if (e.key === "Enter" && popUpPage.classList[1] === "none") {
@@ -116,15 +129,7 @@ document.addEventListener("keydown", (e) => {
           // 기회 모두 소진 시 실패화면 표시
 
           currentRowInputs.forEach((input, index) => {
-            // 색처리, 줄 비활성화
-            const value = input.value;
-            if (value === splitedAnswer[index]) {
-              ApplyColor(input, text, green);
-            } else if (splitedAnswer.includes(value)) {
-              ApplyColor(input, text, yellow);
-            } else {
-              ApplyColor(input, text, grey);
-            }
+            JudgeAnswer(input, index)
           });
 
           //실패 화면 띄우기
@@ -143,15 +148,7 @@ document.addEventListener("keydown", (e) => {
         //색처리 후 다음줄로 이동 (색처리 아직 안됨)
 
         currentRowInputs.forEach((input, index) => {
-          // 색처리, 줄 비활성화
-          const value = input.value;
-          if (value === splitedAnswer[index]) {
-            ApplyColor(input, text, green);
-          } else if (splitedAnswer.includes(value)) {
-            ApplyColor(input, text, yellow);
-          } else {
-            ApplyColor(input, text, grey);
-          }
+          JudgeAnswer(input, index)
         });
 
         currentRowInputs.forEach((input) => {
