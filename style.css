@@ -30,6 +30,7 @@
     outline: 1px solid #DFE1E9;
     background-color: #FBFCFF;
     caret-color: transparent;
+    border-radius: 12px;
 }
 
 .popup-page {

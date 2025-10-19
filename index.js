@@ -7,13 +7,17 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled); // 최댓값은 제외, 최솟값은 포함
 }
 
-const index = getRandomInt(0, wordList.length);
-const answer = wordList[index];
-console.log(answer);
+function MakeAnswer() {
+  const index = getRandomInt(0, wordList.length);
+  const answer = wordList[index];
+  console.log(answer);
+  return answer;
+}
+
+let answer = MakeAnswer();
 
 let currentRow = 0;
 let isPlaying = true;
-
 
 // input 열 nodelist 로 가져오기
 const inputRows = document.querySelectorAll(".wordle-row");
@@ -60,8 +64,16 @@ board.addEventListener("keyup", (e) => {
 //결과 화면 가져오기
 const popUpPage = document.querySelector(".popup-page");
 
+function ApplyColor(input, text, color) {
+  //색 처리
+  input.style.color = text;
+  input.style.backgroundColor = color;
+  //현재 줄 비활성화
+  input.setAttribute("disabled", "");
+}
+
 //채점 및 다음 줄 이동
-document.addEventListener("keypress", (e) => {
+document.addEventListener("keydown", (e) => {
   //색 정의
   const green = "#538D4E";
   const yellow = "#B59F3B";
@@ -71,9 +83,8 @@ document.addEventListener("keypress", (e) => {
   // 정답 분리
   let splitedAnswer = answer.split("");
 
-
   //Enter키 입력확인
-  if (e.key === "Enter") {
+  if (e.key === "Enter" && popUpPage.classList[1] === "none") {
     //글자 합치기
     let userAnswer = "";
     for (let i = 0; i < 4; i++) {
@@ -85,11 +96,7 @@ document.addEventListener("keypress", (e) => {
       if (userAnswer === answer) {
         //답 비교
         currentRowInputs.forEach((input) => {
-          //색 처리
-          input.style.color = text;
-          input.style.backgroundColor = green;
-          //현재 줄 비활성화
-          input.setAttribute("disabled", "");
+          ApplyColor(input, text, green);
 
           //승리화면 표시
 
@@ -101,6 +108,7 @@ document.addEventListener("keypress", (e) => {
             </div>
           `;
 
+          isPlaying = false
           popUpPage.classList.remove("none");
         });
       } else {
@@ -111,17 +119,11 @@ document.addEventListener("keypress", (e) => {
             // 색처리, 줄 비활성화
             const value = input.value;
             if (value === splitedAnswer[index]) {
-              input.style.color = text;
-              input.style.backgroundColor = green;
-              input.setAttribute("disabled", "");
+              ApplyColor(input, text, green);
             } else if (splitedAnswer.includes(value)) {
-              input.style.color = text;
-              input.style.backgroundColor = yellow;
-              input.setAttribute("disabled", "");
+              ApplyColor(input, text, yellow);
             } else {
-              input.style.color = text;
-              input.style.backgroundColor = grey;
-              input.setAttribute("disabled", "");
+              ApplyColor(input, text, grey);
             }
           });
 
@@ -134,6 +136,7 @@ document.addEventListener("keypress", (e) => {
             </div>
           `;
 
+          isPlaying = false
           popUpPage.classList.remove("none");
           return;
         }
@@ -143,17 +146,11 @@ document.addEventListener("keypress", (e) => {
           // 색처리, 줄 비활성화
           const value = input.value;
           if (value === splitedAnswer[index]) {
-            input.style.color = text;
-            input.style.backgroundColor = green;
-            input.setAttribute("disabled", "");
+            ApplyColor(input, text, green);
           } else if (splitedAnswer.includes(value)) {
-            input.style.color = text;
-            input.style.backgroundColor = yellow;
-            input.setAttribute("disabled", "");
+            ApplyColor(input, text, yellow);
           } else {
-            input.style.color = text;
-            input.style.backgroundColor = grey;
-            input.setAttribute("disabled", "");
+            ApplyColor(input, text, grey);
           }
         });
 
@@ -176,4 +173,48 @@ document.addEventListener("keypress", (e) => {
       }, 3000);
     }
   }
+});
+
+function DeleteColor(input) {
+  //색 처리
+  input.style.color = "black";
+  input.style.backgroundColor = "#FBFCFF";
+}
+
+function ResetGame() {
+  //결과화면 사라지기
+  popUpPage.classList.add("none");
+
+  const Rows = [...inputRows];
+
+  //input들 초기화
+  for (let i = 0; i < 5; i++) {
+    const AllInputs = [...Rows[i].children];
+    AllInputs.forEach((input) => {
+      input.value = "";
+      DeleteColor(input);
+    });
+  }
+
+  //현재 줄 첫번째로 변경
+  currentRow = 0;
+  currentRowInputs = [...inputRows[currentRow].children];
+
+  //첫째 줄 빼고 비활성화
+  if (currentRowInputs) {
+    currentRowInputs.forEach((input) => {
+      input.removeAttribute("disabled");
+    });
+    currentRowInputs[0].focus();
+  }
+
+  //새로운 정답 생성
+  answer = MakeAnswer();
+}
+
+popUpPage.addEventListener("click", (e) => {
+  //버튼이 아니면 제외
+  if (e.target.tagName !== "BUTTON") return;
+
+  ResetGame()
 });
