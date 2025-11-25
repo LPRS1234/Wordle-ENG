@@ -14,13 +14,11 @@ function MakeAnswer() {
   return answer;
 }
 
+// 정답
 let answer = MakeAnswer();
-
-// 정답 분리
 let splitedAnswer = answer.split("");
 
 let currentRow = 0;
-let isPlaying = true;
 
 // 색 정의
 const green = "#538D4E";
@@ -33,11 +31,22 @@ const inputRows = document.querySelectorAll(".wordle-row");
 // NodeList to Array
 let currentRowInputs = [...inputRows[currentRow].children];
 
+// true면 Remove disabled(활성화) false면 Set disabled(비활성화)
+function RowInputsController(bool) {
+  if(bool === true) {
+    currentRowInputs.forEach((input) => {
+      input.removeAttribute("disabled");
+    });
+  } else if(bool === false) {
+    currentRowInputs.forEach((input) => {
+      input.setAttribute("disabled", "");
+    });
+  }
+}
+
 //현재 줄 비활성화 해제
 if (currentRowInputs) {
-  currentRowInputs.forEach((input) => {
-    input.removeAttribute("disabled");
-  });
+  RowInputsController(true)
   currentRowInputs[0].focus();
 }
 
@@ -49,6 +58,11 @@ board.addEventListener("keyup", (e) => {
   const input = e.target;
 
   if (input.tagName !== "INPUT") return; //input이 아닌 태그에 대한 이벤트 다 제외
+
+  //input에 영어만 입력하도록 제한
+  input.addEventListener("input", () => {
+    input.value = input.value.replace(/[^A-Za-z]/g, "");
+  });
 
   const userKeyEvent = e.key.toLowerCase();
   if (!keyboard.includes(userKeyEvent)) return; //허용 키 선별
@@ -73,7 +87,7 @@ board.addEventListener("keyup", (e) => {
 //결과 화면 가져오기
 const popUpPage = document.querySelector(".popup-page");
 
-function ApplyColor(input, text, color) {
+function ApplyColor(input, color) {
   //색 처리
   input.style.color = text;
   input.style.backgroundColor = color;
@@ -85,12 +99,23 @@ function JudgeAnswer(input, index) {
   // 색처리, 줄 비활성화
   const value = input.value;
   if (value === splitedAnswer[index]) {
-    ApplyColor(input, text, green);
+    ApplyColor(input, green);
   } else if (splitedAnswer.includes(value)) {
-    ApplyColor(input, text, yellow);
+    ApplyColor(input, yellow);
   } else {
-    ApplyColor(input, text, grey);
+    ApplyColor(input, grey);
   }
+}
+
+function ShowPopUp(title, answer) {
+  popUpPage.innerHTML = `
+            <div>
+                <h2>${title}</h2>
+                <h3>Answer was ${answer}!!</h3>
+                <button class="restart">Restart</button>
+            </div>
+          `;
+          popUpPage.classList.remove("none");
 }
 
 //채점 및 다음 줄 이동
@@ -109,20 +134,10 @@ document.addEventListener("keydown", (e) => {
       if (userAnswer === answer) {
         //답 비교
         currentRowInputs.forEach((input) => {
-          ApplyColor(input, text, green);
+          ApplyColor(input, green);
 
           //승리화면 표시
-
-          popUpPage.innerHTML = `
-            <div>
-                <h2>You Win!!</h2>
-                <h3>Answer was ${answer}!!</h3>
-                <button class="restart">Restart</button>
-            </div>
-          `;
-
-          isPlaying = false
-          popUpPage.classList.remove("none");
+          ShowPopUp("You Win!!", answer)
         });
       } else {
         if (currentRow == 4) {
@@ -133,32 +148,17 @@ document.addEventListener("keydown", (e) => {
           });
 
           //실패 화면 띄우기
-          popUpPage.innerHTML = `
-            <div>
-                <h2>You Lose..</h2>
-                <h3>Answer is ${answer}!</h3>
-                <button class="restart">Restart</button>
-            </div>
-          `;
-
-          isPlaying = false
-          popUpPage.classList.remove("none");
+          ShowPopUp("You Lose..", answer)
           return;
         }
-        //색처리 후 다음줄로 이동 (색처리 아직 안됨)
+        //색처리 후 다음줄로 이동
 
         currentRowInputs.forEach((input, index) => {
           JudgeAnswer(input, index)
         });
-
-        currentRowInputs.forEach((input) => {
-          input.setAttribute("disabled", "");
-        });
         currentRow++;
         currentRowInputs = [...inputRows[currentRow].children];
-        currentRowInputs.forEach((input) => {
-          input.removeAttribute("disabled");
-        });
+        RowInputsController(true)
         currentRowInputs[0].focus();
       }
     } else {
@@ -199,14 +199,13 @@ function ResetGame() {
 
   //첫째 줄 빼고 비활성화
   if (currentRowInputs) {
-    currentRowInputs.forEach((input) => {
-      input.removeAttribute("disabled");
-    });
+    RowInputsController(true)
     currentRowInputs[0].focus();
   }
 
   //새로운 정답 생성
   answer = MakeAnswer();
+  splitedAnswer = answer.split("");
 }
 
 popUpPage.addEventListener("click", (e) => {
